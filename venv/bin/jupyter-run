@@ -1,4 +1,4 @@
-#!/root/projects/binanceapp/venv/bin/python3
+#!/root/projects/binance_first/venv/bin/python3
 
 # -*- coding: utf-8 -*-
 import re
