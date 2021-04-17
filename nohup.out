@@ -224,3 +224,51 @@ KeyError: <_UnixSelectorEventLoop running=True closed=False debug=False>
 [W 16:17:15.773 NotebookApp] delete /binance_trial/requirements.txt
 [W 16:41:34.960 NotebookApp] Notebook binance_first.ipynb is not trusted
 [I 16:41:35.557 NotebookApp] Kernel started: 00e51626-23a4-4066-a270-85d0c76b9f31, name: python3
+[I 17:41:50.874 NotebookApp] Authentication of /metrics is OFF, since other authentication is disabled.
+[W 17:41:52.052 NotebookApp] All authentication is disabled.  Anyone who can connect to this server will be able to run code.
+[I 17:41:52.053 NotebookApp] The port 8888 is already in use, trying another port.
+[I 17:41:52.053 NotebookApp] The port 8889 is already in use, trying another port.
+[I 17:41:52.056 NotebookApp] Serving notebooks from local directory: /root/projects/binance_first
+[I 17:41:52.057 NotebookApp] Jupyter Notebook 6.3.0 is running at:
+[I 17:41:52.057 NotebookApp] http://localhost:8890/
+[I 17:41:52.057 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[W 17:41:52.064 NotebookApp] No web browser found: could not locate runnable browser.
+[I 17:44:08.869 NotebookApp] Interrupted...
+[I 17:44:08.870 NotebookApp] Shutting down 0 kernels
+[I 17:44:08.870 NotebookApp] Shutting down 0 terminals
+[I 18:03:46.952 NotebookApp] Authentication of /metrics is OFF, since other authentication is disabled.
+[W 18:03:47.318 NotebookApp] All authentication is disabled.  Anyone who can connect to this server will be able to run code.
+[I 18:03:47.318 NotebookApp] The port 8888 is already in use, trying another port.
+[I 18:03:47.321 NotebookApp] Serving notebooks from local directory: /root/projects/binance_first
+[I 18:03:47.321 NotebookApp] Jupyter Notebook 6.3.0 is running at:
+[I 18:03:47.322 NotebookApp] http://localhost:8889/
+[I 18:03:47.322 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[W 18:03:47.327 NotebookApp] No web browser found: could not locate runnable browser.
+[I 18:21:13.272 NotebookApp] Interrupted...
+[I 18:21:13.273 NotebookApp] Shutting down 0 kernels
+[I 18:21:13.273 NotebookApp] Shutting down 0 terminals
+[I 18:21:35.400 NotebookApp] Authentication of /metrics is OFF, since other authentication is disabled.
+[W 18:21:35.759 NotebookApp] All authentication is disabled.  Anyone who can connect to this server will be able to run code.
+[I 18:21:35.763 NotebookApp] Serving notebooks from local directory: /root/projects/binance_first
+[I 18:21:35.763 NotebookApp] Jupyter Notebook 6.3.0 is running at:
+[I 18:21:35.763 NotebookApp] http://localhost:8888/
+[I 18:21:35.763 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[W 18:21:35.769 NotebookApp] No web browser found: could not locate runnable browser.
+[W 18:21:42.616 NotebookApp] Notebook binance_first.ipynb is not trusted
+[I 18:21:43.024 NotebookApp] Kernel started: 032509df-480a-4f2a-b9ef-06330dfc2b69, name: python3
+ERROR:asyncio:Exception in callback <TaskStepMethWrapper object at 0x7ffbf49463c8>()
+handle: <Handle <TaskStepMethWrapper object at 0x7ffbf49463c8>()>
+Traceback (most recent call last):
+  File "/usr/lib/python3.6/asyncio/events.py", line 145, in _run
+    self._callback(*self._args)
+KeyError: <_UnixSelectorEventLoop running=True closed=False debug=False>
+[I 18:23:43.084 NotebookApp] Saving file at /binance_first.ipynb
+[W 18:23:43.085 NotebookApp] Notebook binance_first.ipynb is not trusted
+[I 18:49:43.208 NotebookApp] Saving file at /binance_first.ipynb
+[W 18:49:43.208 NotebookApp] Notebook binance_first.ipynb is not trusted
+[I 18:51:43.398 NotebookApp] Saving file at /binance_first.ipynb
+[W 18:51:43.398 NotebookApp] Notebook binance_first.ipynb is not trusted
+[I 18:55:43.095 NotebookApp] Saving file at /binance_first.ipynb
+[W 18:55:43.096 NotebookApp] Notebook binance_first.ipynb is not trusted
+[I 18:57:43.060 NotebookApp] Saving file at /binance_first.ipynb
+[W 18:57:43.061 NotebookApp] Notebook binance_first.ipynb is not trusted
