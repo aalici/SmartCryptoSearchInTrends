@@ -182,13 +182,19 @@ def match_symbol_with_tweets(v_score=90):
 
 
 
-def send_mails_with_matches():
-    v_list = match_symbol_with_tweets(v_score=90)
+def send_mails_with_matches(v_score_match = None):
+    if v_score_match is None:
+        v_score = 90
+    else:
+        v_score = v_score_match
+    v_list = match_symbol_with_tweets(v_score)
     mail_body = ''
     for topic in v_list:
         mail_body = mail_body + ' $ '.join(topic[0:4]) + '\n'  
     if len(v_list) > 0:
         f_send_mail(mail_content = mail_body)
+    else:
+        logger.info('Does not match anything, so we have nothing to sent!')
     
 
 

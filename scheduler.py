@@ -4,10 +4,10 @@
 # export
 import schedule
 import time
-import GeneralFunctions gf
+import GeneralFunctions as gf
 
 def job():
-    gf.send_mails_with_matches()
+    gf.send_mails_with_matches(80)
     print("I'm working...")
 
 #schedule.every(10).seconds.do(job)
