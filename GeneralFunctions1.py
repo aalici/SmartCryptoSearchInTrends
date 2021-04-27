@@ -7,7 +7,6 @@ import pandas as pd
 import os
 import pickle
 import exporter
-from datetime import datetime, timedelta
 
 
 #email sending
@@ -123,32 +122,6 @@ def get_tweet_trends_by_loc(v_api, v_loc):
     return list_tmp
 
 
-def get_tweets_from_user(v_api, v_userid):
-    # fetching the tweets
-    list_tmp = []
-    tweets = v_api.user_timeline(screen_name=v_userid, 
-                               # 100 is the maximum allowed count
-                               count=100,
-                               include_rts = False,
-                               # Necessary to keep full_text 
-                               # otherwise only the first 140 words are extracted
-                               #tweet_mode = 'extended'
-                               )
-
-
-    # printing the statuses
-    for info in tweets:
-        dt_hours_from_now = datetime.now() + timedelta(hours=-12)
-        if info.created_at >= dt_hours_from_now: 
-            txt = "ID: {id}, Date: {dt}, Text: {txt}".format(id=info.id, dt= info.created_at, txt= info.text )
-            list_tmp.append(txt)
-            #print("ID: {}".format(info.id))
-            #print(info.created_at)
-            #print(info.text, end = "\n\n")
-
-    return list_tmp
-
-
 
 def tweet_analyze():
     api = connect_tweet()
@@ -156,47 +129,14 @@ def tweet_analyze():
     tweet_dict = {}
     tweet_dict.update({"TR TREND TOPICS": get_tweet_trends_by_loc(api, "TR")}) 
     tweet_dict.update({"US TREND TOPICS": get_tweet_trends_by_loc(api, "US")}) 
-    
-    tweetuserid = 'elonmusk'
-    tweet_dict.update({"TWEET from " + tweetuserid: get_tweets_from_user(api, tweetuserid)})
-    
     return tweet_dict
-
-
-def match_symbol_with_tweets(v_score=90):
-
-    file = open("coin_list_df.pkl","rb")
-    coin_list_df = pickle.load(file)
-
-    dict_tw = tweet_analyze()
-    list_tmp=[]
-    for index, row in coin_list_df.iterrows():
-        for key in dict_tw:
-            for trendtopic in dict_tw.get(key):
-                name_score = fuzz.token_set_ratio(row["Name"].lower(), trendtopic.lower())
-                symbol_score = fuzz.token_set_ratio(row["Symbol"].lower(), trendtopic.lower())
-                if name_score > v_score | symbol_score > v_score :
-                    list_tmp.append([key, row["Name"], row["Symbol"], trendtopic.lower(), name_score, symbol_score  ])
-
-    return list_tmp
-
-
-
-def send_mails_with_matches():
-    v_list = match_symbol_with_tweets(v_score=90)
-    mail_body = ''
-    for topic in v_list:
-        mail_body = mail_body + ' $ '.join(topic[0:4]) + '\n'  
-    if len(v_list) > 0:
-        f_send_mail(mail_content = mail_body)
-    
 
 
 # export
 if __name__ == "__main__":
-    v_list = match_symbol_with_tweets(v_score=90)
+    v_dict = tweet_analyze()
     mail_body = ''
-    for topic in v_list:
-        mail_body = mail_body + ' $ '.join(topic[0:4]) + '\n'  
-    if len(v_list) > 0:
-        f_send_mail(mail_content = mail_body)
+    for key in v_dict:
+        mail_body = mail_body + 'For {country} trend topics: '.format(country=key) + '\n'  
+        mail_body = mail_body + '\n'.join(v_dict.get(key)) + "\n############## \n\n" 
+    f_send_mail(mail_content = mail_body)
