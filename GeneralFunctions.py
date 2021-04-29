@@ -69,7 +69,9 @@ def f_send_mail(mail_content=None,
     message['To'] = receiver_address
     message['Subject'] = mail_subject   #The subject line
     #The body and the attachments for the mail
-    message.attach(MIMEText(mail_content, 'plain'))
+    message.add_header('Content-Type','text/html')
+    
+    message.attach(MIMEText(mail_content, 'html'))
     try:
         #Create SMTP session for sending the mail
         session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
@@ -138,7 +140,7 @@ def get_tweets_from_user(v_api, v_userid):
 
     # printing the statuses
     for info in tweets:
-        dt_hours_from_now = datetime.now() + timedelta(hours=-12)
+        dt_hours_from_now = datetime.now() + timedelta(hours=-72)
         if info.created_at >= dt_hours_from_now: 
             txt = "ID: {id}, Date: {dt}, Text: {txt}".format(id=info.id, dt= info.created_at, txt= info.text )
             list_tmp.append(txt)
@@ -188,13 +190,17 @@ def send_mails_with_matches(v_score_match = None):
     else:
         v_score = v_score_match
     v_list = match_symbol_with_tweets(v_score)
-    mail_body = ''
-    for topic in v_list:
-        mail_body = mail_body + ' $ '.join(topic[0:4]) + '\n'  
+    df = pd.DataFrame(data = v_list, columns =["Source","Coin", "Symbol", "News", "Score1", "Score2"])
+    #return df.to_html() 
+    mail_body = df.to_html()
+    #for topic in v_list:
+    #    mail_body = mail_body + ' $ '.join(topic[0:4]) + '\n'  
     if len(v_list) > 0:
         f_send_mail(mail_content = mail_body)
+        print("successfully send mail")
     else:
         logger.info('Does not match anything, so we have nothing to sent!')
+        print("Does not match anything, so we have nothing to sent!")
     
 
 
