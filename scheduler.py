@@ -5,6 +5,7 @@
 import schedule
 import time
 import GeneralFunctions as gf
+import random, string
 
 import logging
 
@@ -28,13 +29,18 @@ logger.addHandler(file_handler)
 # export
 
 def job():
-    logger.info("Scheduler kick offs new job!")
-    gf.send_mails_with_matches(85)
-    print("I'm working...")
+    key = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+    logger.info("Scheduler kick offs new job! key is {key}".format(key=key))
+    gf.send_mails_with_matches(v_score_match = 85, 
+                               v_mail_subject = "WEB Trend Analysis - SmartCryptoAnalysis with key:{key}".format(key=key),
+                               v_to_address = "ali.alici84@gmail.com;neslihanbilgier@gmail.com" )
+    #gf.send_mails_with_matches(v_score_match = 85, 
+    #                           v_mail_subject = 'Smart Stock Prediction Run with key:{key}'.format(key=key))
+    
 
 #schedule.every(10).seconds.do(job)
-#schedule.every(15).minutes.do(job)
-schedule.every().hour.do(job)
+schedule.every(60).minutes.do(job)
+#schedule.every().hour.do(job)
 #schedule.every().day.at("10:30").do(job)
 #schedule.every(5).to(10).minutes.do(job)
 #schedule.every().monday.do(job)
@@ -42,5 +48,6 @@ schedule.every().hour.do(job)
 #schedule.every().minute.at(":17").do(job)
 
 while True:
+    #logger.info("Scheduler works!")
     schedule.run_pending()
     time.sleep(10)

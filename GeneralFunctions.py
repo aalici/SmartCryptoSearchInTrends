@@ -4,6 +4,7 @@
 #export
 #General imports
 import pandas as pd
+import numpy as np
 import os
 import pickle
 import exporter
@@ -140,7 +141,7 @@ def get_tweets_from_user(v_api, v_userid):
 
     # printing the statuses
     for info in tweets:
-        dt_hours_from_now = datetime.now() + timedelta(hours=-72)
+        dt_hours_from_now = datetime.now() + timedelta(hours=-96)
         if info.created_at >= dt_hours_from_now: 
             txt = "ID: {id}, Date: {dt}, Text: {txt}".format(id=info.id, dt= info.created_at, txt= info.text )
             list_tmp.append(txt)
@@ -151,8 +152,18 @@ def get_tweets_from_user(v_api, v_userid):
     return list_tmp
 
 
+def get_google_trends(pn='united_states'):
+    pytrends = TrendReq()
+    try:
+        listx = list(pytrends.trending_searches(pn=pn).iloc[:, 0])
+        logger.info('Successfully connected to GOOGLETRENDS API')
+    except:
+        listx = []
+        logger.error('Failed to connect GOOGLETRENDS API')
+    return listx 
 
-def tweet_analyze():
+
+def web_analyze_all():
     api = connect_tweet()
 
     tweet_dict = {}
@@ -162,6 +173,8 @@ def tweet_analyze():
     tweetuserid = 'elonmusk'
     tweet_dict.update({"TWEET from " + tweetuserid: get_tweets_from_user(api, tweetuserid)})
     
+    tweet_dict.update({"Google US Trends ": get_google_trends()})
+    
     return tweet_dict
 
 
@@ -170,37 +183,73 @@ def match_symbol_with_tweets(v_score=90):
     file = open("coin_list_df.pkl","rb")
     coin_list_df = pickle.load(file)
 
-    dict_tw = tweet_analyze()
+    dict_tw = web_analyze_all()
     list_tmp=[]
     for index, row in coin_list_df.iterrows():
         for key in dict_tw:
             for trendtopic in dict_tw.get(key):
-                name_score = fuzz.token_set_ratio(row["Name"].lower(), trendtopic.lower())
-                symbol_score = fuzz.token_set_ratio(row["Symbol"].lower(), trendtopic.lower())
-                if name_score > v_score | symbol_score > v_score :
-                    list_tmp.append([key, row["Name"], row["Symbol"], trendtopic.lower(), name_score, symbol_score  ])
+                list_query = row["Keywords"].split(",")
+                #print(list_query)
+                #print(trendtopic.lower())
+                score = f_string_match(list_query, trendtopic.lower())
+                #print(score)
+                if score > v_score:
+                    #print("girdim {key}".format(key= key))
+                    #print("************************")
+                    list_tmp.append([key, row["Name"], row["Keywords"], trendtopic.lower(), score])
+                    #print([key, row["Keywords"], trendtopic.lower(), score])
+                    #print("************************")
+                #name_score = fuzz.token_set_ratio(row["Name"].lower(), trendtopic.lower())
+                #symbol_score = fuzz.token_set_ratio(row["Symbol"].lower(), trendtopic.lower())
+                #if name_score > v_score | symbol_score > v_score :
+                #    list_tmp.append([key, row["Name"], row["Symbol"], trendtopic.lower(), name_score, symbol_score  ])
+    
+    return pd.DataFrame(data = list_tmp, columns =["Source","Coin", "Keywords", "News", "Score"]).sort_values("Coin")
 
-    return list_tmp
 
 
-
-def send_mails_with_matches(v_score_match = None):
+def send_mails_with_matches(v_score_match = None, 
+                            v_mail_subject = None,
+                            v_to_address = None):
     if v_score_match is None:
         v_score = 90
     else:
         v_score = v_score_match
-    v_list = match_symbol_with_tweets(v_score)
-    df = pd.DataFrame(data = v_list, columns =["Source","Coin", "Symbol", "News", "Score1", "Score2"])
+    df = match_symbol_with_tweets(v_score)
     #return df.to_html() 
-    mail_body = df.to_html()
+    
     #for topic in v_list:
     #    mail_body = mail_body + ' $ '.join(topic[0:4]) + '\n'  
-    if len(v_list) > 0:
-        f_send_mail(mail_content = mail_body)
+    if len(df) > 0:
+        mail_body = df.to_html()
+        f_send_mail(mail_content = mail_body, mail_subject = v_mail_subject, mail_to = v_to_address)
         print("successfully send mail")
     else:
         logger.info('Does not match anything, so we have nothing to sent!')
         print("Does not match anything, so we have nothing to sent!")
+
+
+def f_string_match(list_query = ["dogecoin", "dogefatherx", "doge coin"], 
+                   ref_string = "elonmust said dogefather!!"):
+    max_score = 0
+    for x in list_query:
+        if len(x.split()) == 1:
+            for ref_x in ref_string.split():
+                new_max_score = fuzz.ratio(x, ref_x)
+                #print("tek kelime {x} ve {ref_x} score: {score}".format(x=x, ref_x = ref_x, score = new_max_score))
+                if new_max_score > max_score:
+                    max_score = new_max_score
+        else:    
+            new_max_score = max( \
+                               [fuzz.partial_ratio(x, ref_string),  
+                               fuzz.token_set_ratio(x, ref_string), 
+                               fuzz.token_sort_ratio(x, ref_string)
+                               ]
+                             )
+            if new_max_score > max_score:
+                max_score = new_max_score
+
+    return max_score        
     
 
 
