@@ -72,6 +72,7 @@ def f_send_mail(mail_content=None,
     #The body and the attachments for the mail
     message.add_header('Content-Type','text/html')
     
+    
     message.attach(MIMEText(mail_content, 'html'))
     try:
         #Create SMTP session for sending the mail
@@ -79,7 +80,7 @@ def f_send_mail(mail_content=None,
         session.starttls() #enable security
         session.login(sender_address, sender_pass) #login with mail_id and password
         text = message.as_string()
-        session.sendmail(sender_address, receiver_address, text)
+        session.sendmail(sender_address, receiver_address.split(";"), text)
         session.quit()
         logger.info('Mail Sent')
     except:
@@ -232,10 +233,12 @@ def send_mails_with_matches(v_score_match = None,
 def f_string_match(list_query = ["dogecoin", "dogefatherx", "doge coin"], 
                    ref_string = "elonmust said dogefather!!"):
     max_score = 0
+    new_max_score = 0
     for x in list_query:
         if len(x.split()) == 1:
             for ref_x in ref_string.split():
-                new_max_score = fuzz.ratio(x, ref_x)
+                if ref_x.startswith(x):
+                    new_max_score = fuzz.ratio(x, ref_x) - 5  #penalty point
                 #print("tek kelime {x} ve {ref_x} score: {score}".format(x=x, ref_x = ref_x, score = new_max_score))
                 if new_max_score > max_score:
                     max_score = new_max_score
