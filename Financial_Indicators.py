@@ -19,6 +19,16 @@ from twisted.internet import reactor
 from datetime import datetime
 import btalib
 
+
+#cor coinmarketcapapi
+from coinmarketcapapi import CoinMarketCapAPI, CoinMarketCapAPIError
+from requests import Request, Session
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+import json
+
+#custom library
+import MLTrain as mlt
+
 pd.set_option('display.max_rows', 500)
 
 
@@ -37,6 +47,62 @@ file_handler.setFormatter(formatter)
 
 # add file handler to logger
 logger.addHandler(file_handler)
+
+
+# export
+def get_coin_market_cap_data():
+    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+    parameters = {
+      'start':'1',
+      'limit':'1000',
+      'convert':'USD'
+    }
+    headers = {
+      'Accepts': 'application/json',
+      'X-CMC_PRO_API_KEY': os.environ.get('COIN_MARKET_CAP_API_KEY'),
+    }
+
+    session = Session()
+    session.headers.update(headers)
+
+    try:
+      logger.info('try to connect {url}'.format(url=url))  
+      response = session.get(url, params=parameters)
+      data = json.loads(response.text)
+      #print(data)
+    except (ConnectionError, Timeout, TooManyRedirects) as e:
+      print(e)
+      logger.error('Can NOT connect {url}'.format(url=url))
+
+
+    now = datetime.now()
+    dt_string = now.strftime("%Y%m%d%H%M")
+
+    listx = []
+    for coin_dict in data.get("data"):
+        listx.append([ \
+            coin_dict.get('name'),
+            coin_dict.get('symbol'),
+            coin_dict.get('cmc_rank'),
+            coin_dict.get('quote').get('USD').get('volume_24h'),
+            coin_dict.get('quote').get('USD').get('market_cap'),
+            coin_dict.get('quote').get('USD').get('last_updated'),
+            dt_string          
+        ])
+    
+    return listx
+
+
+def append_coin_market_cap_data(v_list):
+    file = open("cmc_data.pkl","rb")
+    list_old = pickle.load(file)
+    
+    list_all = list_old + v_list
+    
+    pickle_out = open("cmc_data.pkl","wb")
+    pickle.dump(list_all, pickle_out)
+    pickle_out.close()
+
 
 
 # export
@@ -70,7 +136,7 @@ def f_load_allcoins(coin_list = None):
         dict_coin = {}    
         logger.info('Initial load {x}'.format(x=coin))
         try:
-            klines = client.get_historical_klines(coin, Client.KLINE_INTERVAL_4HOUR, "365 day ago UTC")
+            klines = client.get_historical_klines(coin, Client.KLINE_INTERVAL_2HOUR, "365 day ago UTC")
         except Exception as e:
             print(str(e))
             logger.error('Initial load {x} FAILED'.format(x=coin))
@@ -98,7 +164,7 @@ def f_update_lastNdays(dict_all=None):
         logger.info('try to update coin {x}'.format(x=coin))
         
         try:
-            klines = client.get_historical_klines(coin, Client.KLINE_INTERVAL_4HOUR, "2 day ago UTC")
+            klines = client.get_historical_klines(coin, Client.KLINE_INTERVAL_2HOUR, "2 day ago UTC")
         except Exception as e:
             print(str(e))
             logger.error('UPDATE list of coin: {x} FAILED, seems no info'.format(x=coin))
@@ -178,12 +244,17 @@ def f_get_all_price(dict_all_coins):
     
 
 
-def f_calc_indicators(df_all_coins):
-
+def f_calc_indicators(df):
+    df_all_coins = df.copy()
+    
     #df_all_coins = f_get_all_price()
     
     for coin in df_all_coins.coin.unique():
         index_t = (df_all_coins.coin == coin)
+        lenx = len(df_all_coins.loc[df_all_coins.coin == coin, :])
+        if  lenx < 100:
+            print("{coin} lacks of enough sample {sample} so lets drop it!!".format(coin=coin, sample=lenx))
+            continue
         #df_all_coins.loc[index_t, 'ma12'] = btalib.sma(df_all_coins.loc[index_t, 'price'], period=12).df.values.tolist()
         #df_all_coins.loc[index_t, 'ma24'] = btalib.sma(df_all_coins.loc[index_t, 'price'], period=24).df.values.tolist()
         #df_all_coins.loc[index_t, 'ma48'] = btalib.sma(df_all_coins.loc[index_t, 'price'], period=48).df.values.tolist()
@@ -205,15 +276,15 @@ def f_calc_indicators(df_all_coins):
     return df_all_coins
 
 
-def f_get_last_minute_rows():
-    df = f_calc_indicators()
+def f_get_last_minute_rows(v_df, rnk = 1):
+    #df = f_calc_indicators()
+    df = v_df.copy()
     df.reset_index(inplace=True)
     df.loc[:, "rnk_dt"] =  df.groupby("coin")["dt"].rank("dense", ascending=False)
-    return df.loc[df.rnk_dt == 1, ["dt", "coin", "price", "rsi14", "rsi28", "macd12_ratio", "signal12_ratio"]]
-    
-    
-
-    
+    df = df.loc[df.rnk_dt == rnk, :]
+    df.set_index("dt", inplace = True)
+    df.drop(['rnk_dt'], axis=1, inplace = True)
+    return df
     
 
 
@@ -255,6 +326,23 @@ def f_transform_df_target(df_all_coins, shift_period = 2):
     pickle_out.close()
     
     return df_all_coins
+
+
+def f_prep_df_to_ML(df):
+    df_tmp = df.copy()
+    df_tmp.dropna(inplace = True)
+    y = df_tmp.loc[:, ["Target"]]
+    X = df_tmp.loc[:, [ x for x in df_tmp.columns if x not in (["Target" 
+                                                                ,"coin" 
+                                                                ,"next1price" 
+                                                                ,"next2price" 
+                                                                ,"next3price" 
+                                                                ,"price"
+                                                               # ,"is_day_end"
+                                                               # ,"last_time"
+                                                               ])  ]]
+
+    return X, y 
 
 
 # export

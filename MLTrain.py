@@ -4,6 +4,7 @@
 # export
 import Financial_Indicators as fi
 import numpy as np
+import pandas as pd
 import pickle
 
 

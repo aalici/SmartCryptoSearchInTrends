@@ -5,6 +5,7 @@
 import schedule
 import time
 import GeneralFunctions as gf
+import Financial_Indicators as fi
 import random, string
 
 import logging
@@ -34,12 +35,20 @@ def job():
     gf.send_mails_with_matches(v_score_match = 85, 
                                v_mail_subject = "WEB Trend Analysis - SmartCryptoAnalysis with key:{key}".format(key=key),
                                v_to_address = "ali.alici84@gmail.com;neslihanbilgier@gmail.com" )
-    #gf.send_mails_with_matches(v_score_match = 85, 
-    #                           v_mail_subject = 'Smart Stock Prediction Run with key:{key}'.format(key=key))
-    
+
+
+def job_load_cmc_data():
+    list_current = fi.get_coin_market_cap_data()
+    append_coin_market_cap_data(list_current)
+    f_send_mail(mail_content="Load CMC data is OK", 
+                mail_subject="Load CMC data")
+
 
 #schedule.every(10).seconds.do(job)
-schedule.every(60).minutes.do(job)
+schedule.every(120).minutes.do(job)
+
+schedule.every(2).minutes.do(job_load_cmc_data)
+
 #schedule.every().hour.do(job)
 #schedule.every().day.at("10:30").do(job)
 #schedule.every(5).to(10).minutes.do(job)
