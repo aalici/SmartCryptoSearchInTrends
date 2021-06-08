@@ -142,7 +142,7 @@ def get_tweets_from_user(v_api, v_userid):
 
     # printing the statuses
     for info in tweets:
-        dt_hours_from_now = datetime.now() + timedelta(hours=-96)
+        dt_hours_from_now = datetime.now() + timedelta(hours=-24)
         if info.created_at >= dt_hours_from_now: 
             txt = "ID: {id}, Date: {dt}, Text: {txt}".format(id=info.id, dt= info.created_at, txt= info.text )
             list_tmp.append(txt)
