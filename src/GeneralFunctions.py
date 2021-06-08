@@ -7,8 +7,12 @@ import pandas as pd
 import numpy as np
 import os
 import pickle
+import sys
 import exporter
 from datetime import datetime, timedelta
+
+sys.path.append('../src/')
+import project_constants 
 
 
 #email sending
@@ -46,10 +50,10 @@ def f_send_mail(mail_content=None,
                 mail_to=None,
                 mail_subject=None):
     if mail_to is None:
-        mail_to = 'ali.alici84@gmail.com'
+        mail_to = 'xxxxxxxxx@gmail.com'
         
     if mail_content is None:
-        mail_content = 'Just try mail sending logic. No specific content is set.'    
+        mail_content = 'Just try mail sending logic. No specific content is set yet.'    
         
     if mail_subject is None:
         mail_subject = 'Test Mail from App'    
@@ -61,7 +65,7 @@ def f_send_mail(mail_content=None,
     #'''
     
     #The mail addresses and password
-    sender_address = 'cuneytsolmazto@gmail.com'
+    sender_address = os.environ.get('GMAIL_FROM_ADDRESS')
     sender_pass = os.environ.get('GMAIL_API_SECRET')
     receiver_address = mail_to
     
@@ -89,7 +93,10 @@ def f_send_mail(mail_content=None,
 
 
 #export
-def connect_tweet():    
+def connect_tweet():
+    '''
+    returns tweepy api
+    '''
     # OAuth process, using the keys and tokens
     consumer_key = os.environ.get('TWEET_CONSUMER_KEY')
     consumer_secret = os.environ.get('TWEET_CONSUMER_SECRET')
@@ -111,6 +118,9 @@ def connect_tweet():
 
 
 def get_tweet_trends_by_loc(v_api, v_loc):
+    '''
+    returns trend topics wrt given location in list
+    '''
     if v_loc == "TR":
         woeid = 23424969
     elif v_loc == "US":
@@ -128,6 +138,9 @@ def get_tweet_trends_by_loc(v_api, v_loc):
 
 
 def get_tweets_from_user(v_api, v_userid):
+    '''
+    returns last 24hour tweets from any specific twitter user in list
+    '''
     # fetching the tweets
     list_tmp = []
     tweets = v_api.user_timeline(screen_name=v_userid, 
@@ -154,6 +167,9 @@ def get_tweets_from_user(v_api, v_userid):
 
 
 def get_google_trends(pn='united_states'):
+    '''
+    returns current trend searches in given location in list
+    '''
     pytrends = TrendReq()
     try:
         listx = list(pytrends.trending_searches(pn=pn).iloc[:, 0])
@@ -165,24 +181,41 @@ def get_google_trends(pn='united_states'):
 
 
 def web_analyze_all():
+    '''
+    returns a dict including all google trends, twitter trends and specific user's tweets all together.
+    '''
     api = connect_tweet()
 
     tweet_dict = {}
     tweet_dict.update({"TR TREND TOPICS": get_tweet_trends_by_loc(api, "TR")}) 
     tweet_dict.update({"US TREND TOPICS": get_tweet_trends_by_loc(api, "US")}) 
     
-    tweetuserid = 'elonmusk'
-    tweet_dict.update({"TWEET from " + tweetuserid: get_tweets_from_user(api, tweetuserid)})
+    #tweetuserid = 'elonmusk'
+    for tweetuserid in project_constants.tweeter_user_list:
+        tweet_dict.update({"TWEET from " + tweetuserid: get_tweets_from_user(api, tweetuserid)})
     
     tweet_dict.update({"Google US Trends ": get_google_trends()})
     
     return tweet_dict
 
 
+def load_crypto_df():
+    '''
+    returns dataframe including all cryptocurrency symbol lookup together with some manually defined keywords
+    '''
+    coin_list_df = pd.read_csv("../lookup/crypto_lu.csv")
+    coin_list_df["Symbolusd"] =  coin_list_df["Symbol"].apply(lambda x: x + "USDT" )
+    coin_list_df["Keywords"]  = coin_list_df.apply(lambda row: row["Name"].lower() + "," + 
+                               #row["Symbol"].lower() + "," + 
+                               row["Symbolusd"].lower() + "," + 
+                               row["Keywords"].lower()  , axis = 1)
+    return coin_list_df
+        
+        
+
 def match_symbol_with_tweets(v_score=90):
 
-    file = open("coin_list_df.pkl","rb")
-    coin_list_df = pickle.load(file)
+    coin_list_df = load_crypto_df()
 
     dict_tw = web_analyze_all()
     list_tmp=[]
@@ -195,8 +228,6 @@ def match_symbol_with_tweets(v_score=90):
                 score = f_string_match(list_query, trendtopic.lower())
                 #print(score)
                 if score > v_score:
-                    #print("girdim {key}".format(key= key))
-                    #print("************************")
                     list_tmp.append([key, row["Name"], row["Keywords"], trendtopic.lower(), score])
                     #print([key, row["Keywords"], trendtopic.lower(), score])
                     #print("************************")
