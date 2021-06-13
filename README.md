@@ -21,6 +21,7 @@ Just after search finish it sends an email to pre-defined mail to list. Mail str
 ![project_constants](https://user-images.githubusercontent.com/32384466/121814885-10838d80-cc7c-11eb-85cc-77b4b97ce561.PNG)
 
 * Once docker is running, it directly kicks the **scheduler.py** file. Such python file is nothing than a basic scheduler which runs defined functions with desired frequency. Frequency of running tasks are set as 30 seconds sequentially. You can change the frequency of scheduler just by modifying the below code block:
+![scheduler](https://user-images.githubusercontent.com/32384466/121814892-17120500-cc7c-11eb-916f-af0940d6637a.PNG)
 
  
 
