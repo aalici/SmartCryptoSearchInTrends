@@ -55,4 +55,4 @@ schedule.every(15).minutes.do(job)
 while True:
     #logger.info("Scheduler works!")
     schedule.run_pending()
-    time.sleep(10)
+    time.sleep(300)
