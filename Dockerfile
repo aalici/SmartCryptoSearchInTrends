@@ -8,4 +8,4 @@ RUN apt-get install -y git
 
 RUN pip install -r requirements.txt
 
-CMD ["python","src/schedule.py"]
+CMD ["python","src/scheduler.py"]
