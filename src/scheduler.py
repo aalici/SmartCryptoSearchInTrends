@@ -42,8 +42,8 @@ def job():
                                v_mail_subject = "WEB Trend Analysis - SmartCryptoAnalysis with key:{key}".format(key=key),
                                v_to_address = mail_to )
 
-schedule.every(30).seconds.do(job)
-#schedule.every(240).minutes.do(job)
+#schedule.every(30).seconds.do(job)
+schedule.every(15).minutes.do(job)
 #schedule.every(240).minutes.do(job_load_cmc_data)
 #schedule.every().hour.do(job)
 #schedule.every().day.at("10:30").do(job)
