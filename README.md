@@ -19,6 +19,8 @@ Just after search finish it sends an email to pre-defined mail to list. Mail str
 
 * Need to change **project_constants.py** for setting the tweeter users you want to follow and mail_to list. 
 
+* Once docker is running, it directly kicks the scheduler.py file. Such python file is nothing than a basic scheduler which runs defined functions with desired frequency. Frequency of running tasks are set as 30 seconds sequentially. You can change the frequency of scheduler just by 
+
 
 ## Items in progress (Since the development is in progress state, all dev code is in a private repo):
 * Fetching real-time prices from binance API and perform a time-series prediction model to guess the direction of price movement.
