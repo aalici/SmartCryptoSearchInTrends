@@ -6,7 +6,7 @@ import schedule
 import time
 import random, string
 import sys
-sys.path.append('../src/')
+sys.path.append('./src/')
 import project_constants 
 import GeneralFunctions as gf
 
@@ -26,8 +26,6 @@ file_handler.setFormatter(formatter)
 
 # add file handler to logger
 logger.addHandler(file_handler)
-
-print(','.join(project_constants.mail_to_list))
 
 
 
