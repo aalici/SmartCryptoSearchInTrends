@@ -4,6 +4,8 @@ Since google search trends and tweeter results are all in text format,  we need 
 
 Just after search finish it sends an email to pre-defined mail to list.
 
+![SmartCryptoSearchInTrends_Results](https://user-images.githubusercontent.com/32384466/121808751-b1fde580-cc62-11eb-9e12-9d5b49e0d849.PNG)
+
 
 
 ##Since the app needs to connect tweeter and a mail account setup as well, you need to pass the credentials for such connections. So just after cloning the repo, one should create .env file under project folder and replace its own credentials as environment variables. Keys for env variables are like below:
