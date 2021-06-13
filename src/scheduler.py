@@ -6,7 +6,7 @@ import schedule
 import time
 import random, string
 import sys
-sys.path.append('../src/')
+sys.path.append('./src/')
 import project_constants 
 import GeneralFunctions as gf
 
@@ -27,8 +27,6 @@ file_handler.setFormatter(formatter)
 # add file handler to logger
 logger.addHandler(file_handler)
 
-print(','.join(project_constants.mail_to_list))
-
 
 
 
@@ -42,8 +40,8 @@ def job():
                                v_mail_subject = "WEB Trend Analysis - SmartCryptoAnalysis with key:{key}".format(key=key),
                                v_to_address = mail_to )
 
-#schedule.every(30).seconds.do(job)
-schedule.every(15).minutes.do(job)
+schedule.every(30).seconds.do(job)
+#schedule.every(240).minutes.do(job)
 #schedule.every(240).minutes.do(job_load_cmc_data)
 #schedule.every().hour.do(job)
 #schedule.every().day.at("10:30").do(job)
@@ -55,4 +53,4 @@ schedule.every(15).minutes.do(job)
 while True:
     #logger.info("Scheduler works!")
     schedule.run_pending()
-    time.sleep(300)
+    time.sleep(10)

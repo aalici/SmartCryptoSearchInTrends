@@ -11,7 +11,7 @@ import sys
 import exporter
 from datetime import datetime, timedelta
 
-sys.path.append('../src/')
+sys.path.append('./src/')
 import project_constants 
 
 
@@ -203,7 +203,7 @@ def load_crypto_df():
     '''
     returns dataframe including all cryptocurrency symbol lookup together with some manually defined keywords
     '''
-    coin_list_df = pd.read_csv("../lookup/crypto_lu.csv")
+    coin_list_df = pd.read_csv("./lookup/crypto_lu.csv")
     coin_list_df["Symbolusd"] =  coin_list_df["Symbol"].apply(lambda x: x + "USDT" )
     coin_list_df["Keywords"]  = coin_list_df.apply(lambda row: row["Name"].lower() + "," + 
                                #row["Symbol"].lower() + "," + 
