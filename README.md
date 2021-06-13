@@ -10,12 +10,12 @@ Just after search finish it sends an email to pre-defined mail to list. Mail str
 ## You need to make some updates on cloning repos like below:
 
 ### Since the app needs to connect tweeter and a mail account setup as well, you need to pass the credentials for such connections. So just after cloning the repo, one should create .env file under project folder and replace its own credentials as environment variables. Keys for env variables are like below:
-* GMAIL_FROM_ADDRESS="xxxx@gmail.com"
-* GMAIL_API_SECRET="xxxxxxxx"
-* TWEETER_CONSUMER_KEY="xxxxxxxx"
-* TWEETER_CONSUMER_SECRET="xxxxxxxx"
-* TWEETER_ACCESS_TOKEN="xxxxxxxx"
-* TWEETER_ACCESS_TOKEN_SECRET="xxxxxxxx"
+  * GMAIL_FROM_ADDRESS="xxxx@gmail.com"
+  * GMAIL_API_SECRET="xxxxxxxx"
+  * TWEETER_CONSUMER_KEY="xxxxxxxx"
+  * TWEETER_CONSUMER_SECRET="xxxxxxxx"
+  * TWEETER_ACCESS_TOKEN="xxxxxxxx"
+  * TWEETER_ACCESS_TOKEN_SECRET="xxxxxxxx"
 
 ### Need to change project_constants.py for setting the tweeter users you want to follow and mail_to list. 
 
